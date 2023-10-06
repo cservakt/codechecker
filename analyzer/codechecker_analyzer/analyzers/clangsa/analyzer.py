@@ -483,9 +483,12 @@ class ClangSA(analyzer_base.SourceAnalyzer):
         Returns the path of the ctu directory (containing the triple).
         """
         config = self.config_handler
-        triple_arch = ctu_triple_arch.get_triple_arch(self.buildaction,
-                                                      self.source_file,
-                                                      config)
+        triple_arch = ctu_triple_arch.get_triple_arch(
+            ClangSA.analyzer_binary(),
+            self.buildaction,
+            self.source_file,
+            config
+        )
         ctu_dir = os.path.join(config.ctu_dir, triple_arch)
         return ctu_dir
 

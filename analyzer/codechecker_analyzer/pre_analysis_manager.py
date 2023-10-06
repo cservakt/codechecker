@@ -105,7 +105,8 @@ def pre_analyze(params):
             ctu_func_map_cmd = ctu_data.get('ctu_func_map_cmd')
 
             triple_arch = \
-                ctu_triple_arch.get_triple_arch(action, action.source,
+                ctu_triple_arch.get_triple_arch(ClangSA.analyzer_binary,
+                                                action, action.source,
                                                 clangsa_config)
 
             # TODO: reorganize the various ctu modes parameters

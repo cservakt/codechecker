@@ -19,8 +19,8 @@ import sys
 from uuid import uuid4
 
 from codechecker_common.logger import get_logger
+from codechecker_analyzer import analyzer_context
 
-from .. import env
 from . import host_check
 
 LOG = get_logger('buildlogger')
@@ -52,6 +52,23 @@ def execute_buildcmd(command, silent=False, env=None, cwd=None):
 
     return proc.returncode
 
+def get_log_env(logfile, original_env):
+    """
+    Environment for logging. With the ld logger.
+    Keep the original environment unmodified as possible.
+    Only environment variables required for logging are changed.
+    """
+    context = analyzer_context.get_context()
+    new_env = original_env
+
+    new_env[context.env_var_cc_logger_bin] = context.path_logger_bin
+
+    new_env['LD_PRELOAD'] = context.logger_lib_path
+
+    # Set ld logger logfile.
+    new_env[context.env_var_cc_logger_file] = logfile
+
+    return new_env
 
 def perform_build_command(logfile, command, keep_link, silent=False,
                           verbose=None):
@@ -83,7 +100,7 @@ def perform_build_command(logfile, command, keep_link, silent=False,
 
         # Same as linux's touch.
         open(logfile, 'a', encoding="utf-8", errors="ignore").close()
-        log_env = env.get_log_env(logfile, original_env)
+        log_env = get_log_env(logfile, original_env)
         if 'CC_LOGGER_GCC_LIKE' not in log_env:
             log_env['CC_LOGGER_GCC_LIKE'] = 'gcc:g++:clang:clang++:cc:c++'
         if keep_link or ('CC_LOGGER_KEEP_LINK' in log_env and

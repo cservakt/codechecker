@@ -10,17 +10,16 @@ Helpers for determining triple arch of a compile action
 """
 
 
-from . import analyzer
 from .. import analyzer_base
 from ..flag import has_flag
 from ..flag import prepend_all
 
 
-def get_compile_command(action, config, source='', output=''):
+def get_compile_command(analyzer_binary, action, config, source='', output=''):
     """ Generate a standardized and cleaned compile command serving as a base
     for other operations. """
 
-    cmd = [analyzer.ClangSA.analyzer_binary()]
+    cmd = [analyzer_binary]
 
     if not has_flag('--target', cmd) and action.target != "":
         cmd.append(f"--target={action.target}")
@@ -63,11 +62,11 @@ def _find_arch_in_command(output):
         pass
 
 
-def get_triple_arch(action, source, config):
+def get_triple_arch(analyzer_binary, action, source, config):
     """Returns the architecture part of the target triple for the given
     compilation command. """
 
-    cmd = get_compile_command(action, config, source)
+    cmd = get_compile_command(analyzer_binary, action, config, source)
     cmd.insert(1, '-###')
     _, stdout, stderr = analyzer_base.SourceAnalyzer.run_proc(cmd,
                                                               action.directory)

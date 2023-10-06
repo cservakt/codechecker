@@ -17,7 +17,7 @@ import tempfile
 import unittest
 
 from codechecker_analyzer.buildlog import log_parser
-from codechecker_analyzer.env import get_log_env
+from codechecker_analyzer.buildlog.build_manager import get_log_env
 from codechecker_common.skiplist_handler import SkipListHandler, \
     SkipListHandlers
 from codechecker_common.util import load_json

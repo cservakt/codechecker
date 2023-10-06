@@ -24,6 +24,8 @@ from codechecker_common.logger import get_logger
 from codechecker_merge_clang_extdef_mappings.merge_clang_extdef_mappings \
     import merge
 
+from .analyzer import ClangSA
+
 from .. import analyzer_base
 from . import ctu_triple_arch
 
@@ -180,7 +182,7 @@ def func_map_list_src_to_ast(func_src_list, ctu_on_demand):
 def get_extdef_mapping_cmd(action, config, source, func_map_cmd):
     """ Get command to create CTU index file. """
 
-    cmd = ctu_triple_arch.get_compile_command(action, config)
+    cmd = ctu_triple_arch.get_compile_command(ClangSA.analyzer_binary, action, config)
     cmd[0] = func_map_cmd
     cmd.insert(1, source)
     cmd.insert(2, '--')

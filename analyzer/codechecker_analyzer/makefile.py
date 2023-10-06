@@ -123,7 +123,8 @@ class MakeFileCreator:
         cmds = []
 
         # Get architecture part of the target triple.
-        triple_arch = get_triple_arch(action, action.source, self.__config)
+        triple_arch = get_triple_arch(ClangSA.analyzer_binary, 
+                                      action, action.source, self.__config)
 
         # Get command to generate PCH file.
         cmd, ast_dir = generate_ast_cmd(action, self.__config,
