@@ -33,7 +33,7 @@ export default {
           value: "guidelineName"
         },
         {
-          text: "Rule Name",
+          text: "Rule Name test",
           value: "guidelineRule"
         },
         {
