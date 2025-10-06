@@ -13,8 +13,8 @@ from math import ceil
 import os
 from typing import Optional
 
-from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, Integer, \
-    LargeBinary, MetaData, String, UniqueConstraint, Table, Text
+from sqlalchemy import Boolean, Column, DateTime, Enum, Float, ForeignKey, \
+    Integer, LargeBinary, MetaData, String, UniqueConstraint, Table, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import true, false
@@ -211,6 +211,8 @@ class RunHistory(Base):
     analysis_info = relationship(
         "AnalysisInfo",
         secondary=RunHistoryAnalysisInfo)
+    
+    metrics = relationship("Metric", back_populates="run_history")
 
     __table_args__ = (UniqueConstraint('run_id', 'version_tag'),)
 
@@ -598,6 +600,46 @@ class CleanupPlanReportHash(Base):
 
     bug_hash = Column(String, primary_key=True)
 
+class MetricType(Base):
+    __tablename__ = 'metric_types'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    metric_type_name = Column(String, nullable=False, unique=True)
+    description = Column(String, nullable=True)
+    aggregation_type = Column(String, nullable=True)
+
+    metrics = relationship("Metric", back_populates="metric_type")
+
+    def __init__(self,
+                 metric_type_name: str,
+                 description=Optional[str],
+                 aggregation_type=Optional[str]):
+        self.metric_type_name = metric_type_name
+        self.description = description
+        self.aggregation_type = aggregation_type
+
+class Metric(Base):
+    __tablename__ = 'metrics'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    run_history_id = Column(Integer, ForeignKey('run_histories.id'),
+                            nullable=False)
+    file_path = Column(String, nullable=False)
+    metric_type_id = Column(Integer, ForeignKey('metric_types.id'), nullable=False)
+    metric_value = Column(Float, nullable=False)
+
+    run_history = relationship("RunHistory", back_populates="metrics")
+    metric_type = relationship("MetricType", back_populates="metrics")
+    
+    def __init__(self,
+                 run_history_id: int,
+                 file_path: str,
+                 metric_type_id: int,
+                 metric_value: float):
+        self.run_history_id = run_history_id
+        self.file_path = file_path
+        self.metric_type_id = metric_type_id
+        self.metric_value = metric_value
 
 IDENTIFIER = {
     'identifier': "RunDatabase",

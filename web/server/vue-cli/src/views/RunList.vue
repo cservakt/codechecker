@@ -306,6 +306,7 @@ export default {
   async mounted() {
     await this.fetchRuns();
     await this.initExpandedItems();
+    await this.testMethod();
 
     this.initialized = true;
   },
@@ -317,6 +318,19 @@ export default {
       } else {
         this.fetchRuns();
       }
+    },
+
+    async testMethod(){
+      const reportCnt = await new Promise(resolve => {
+        ccService.getClient().getReportCntForFilePath(
+          2,
+          "/home",
+          handleThriftError(res => {
+            resolve(res.toNumber());
+          }));
+      });
+      // console.log(reportCnt);
+      return reportCnt;
     },
 
     async onRunHistoryFilterChanged() {

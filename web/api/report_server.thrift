@@ -563,6 +563,10 @@ typedef map<string, list<Rule>> GuidelineRules
 
 service codeCheckerDBAccess {
 
+  i64 getReportCntForFilePath(1: i64 runId,
+                              2: string filePath)
+                              throws (1: codechecker_api_shared.RequestFailed requestError),
+
   // Gives back all analyzed runs.
   // PERMISSION: PRODUCT_VIEW
   RunDataList getRunData(1: RunFilter runFilter,

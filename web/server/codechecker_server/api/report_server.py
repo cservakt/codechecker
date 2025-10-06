@@ -1481,6 +1481,11 @@ class ThriftRequestHandler:
                        date or datetime.now())
 
     @timeit
+    def getReportCntForFilePath(self, runId, filePath):
+        self.__require_view()
+        return runId*10
+
+    @timeit
     def getRunData(self, run_filter, limit, offset, sort_mode):
         self.__require_view()
 

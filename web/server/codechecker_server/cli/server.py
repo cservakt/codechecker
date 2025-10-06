@@ -715,11 +715,12 @@ def __db_migration_multiple(
         failed_products: List[Tuple[str, DBStatus]] = []
         thr_count = util.clamp(1, len(scheduled_upgrades_or_inits),
                                cpu_count())
-        with Pool(max_workers=thr_count) as executor:
+        # with Pool(max_workers=thr_count) as executor:
+        with Pool(processes=thr_count) as executor:
             LOG.info("Initialising/upgrading products using %d concurrent "
                      "jobs...", thr_count)
             for product_cfg, return_status in \
-                    zip(scheduled_upgrades_or_inits, executor.map(
+                    zip(scheduled_upgrades_or_inits, executor.starmap(
                         # Bind the first 2 non-changing arguments of
                         # __db_migration, this is fixed for the execution.
                         partial(__db_migration, migration_root, environ),
@@ -727,7 +728,7 @@ def __db_migration_multiple(
                         # Iterable[Tuple[str], Tuple[str], Tuple[bool]],
                         # and immediately unpack it, thus providing the other
                         # 3 arguments of __db_migration as a parameter pack.
-                        *zip(*scheduled_upgrades_or_inits))):
+                        scheduled_upgrades_or_inits)):
                 if return_status != DBStatus.OK:
                     failed_products.append((product_cfg[0], return_status))
 
